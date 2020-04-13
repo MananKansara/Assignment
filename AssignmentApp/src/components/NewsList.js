@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, FlatList, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { fetchNewsList } from '../redux/action/NewsListData';
-import News from './NewsData';
+import NewsModel from './NewsDataModel';
 
 class NewsList extends Component {
     constructor(props) {
@@ -11,7 +11,9 @@ class NewsList extends Component {
 
         this.state = {
             pageNo: 0,
-            timer: null
+            timer: null,
+            itemModel: "",
+            isItemVisible: false
         }
     }
 
@@ -27,8 +29,6 @@ class NewsList extends Component {
     }
 
     tick = () => {
-        console.log("Tick")
-
         this.setState({
             pageNo: this.state.pageNo + 1
         }, () => {
@@ -36,20 +36,26 @@ class NewsList extends Component {
         });
     }
 
-
     getNewsList() {
         this.props.fetchNewsList(this.state.pageNo)
     }
 
+    onItemPress = (item) => {
+        this.setState({
+            itemModel: JSON.stringify(item),
+            isItemVisible: true
+        })
+    }
+
     renderItem = ({ item, index }) => {
-        console.log("item:" + JSON.stringify(item))
         return (
-            <View style={styles.viewItem}>
+            <TouchableOpacity style={styles.viewItem}
+                onPress={() => this.onItemPress(item)}>
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={{ fontWeight: 'bold' }}>Title: </Text>
                     <Text>{item.title}</Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 
@@ -60,6 +66,12 @@ class NewsList extends Component {
         }} />
     );
 
+    requestClose = () => {
+        this.setState({
+            isNewsVisible: false
+        })
+    }
+
     render() {
         switch (this.props.isFetching) {
             case true:
@@ -69,6 +81,11 @@ class NewsList extends Component {
             case false:
                 return (
                     <View style={styles.viewParent}>
+                        <NewsModel isNewsVisible={this.state.isItemVisible}
+                            requestClose={this.requestClose}
+                            item={this.state.itemModel}>
+                        </NewsModel>
+
                         <FlatList
                             keyExtractor={(item, index) => item.created_at}
                             data={this.props.news}
