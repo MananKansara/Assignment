@@ -6,12 +6,11 @@ export function fetchNewsList(pageNo) {
         dispatch(getNewsList())
 
         axios.get('https://hn.algolia.com/api/v1/search_by_date?tags=story&page=' + pageNo)
-        .then(response => 
-            {
-            console.log("Response:" + JSON.stringify(response))
-            return(dispatch(getNewsSuccess(response)))
-        })
-        .catch(err => dispatch(getNewsFailure(err)))
+            .then(response => {
+                // console.log("Response:" + JSON.stringify(response.data.hits))
+                return (dispatch(getNewsSuccess(response.data.hits)))
+            })
+            .catch(err => dispatch(getNewsFailure(err)))
     }
 }
 

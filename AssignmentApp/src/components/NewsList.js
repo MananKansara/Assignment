@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, ActivityIndicator, Text } from 'react-native';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { fetchNewsList } from '../redux/action/NewsListData';
-import NewsData from './NewsData';
+import News from './NewsData';
 
 class NewsList extends Component {
     constructor(props) {
@@ -41,32 +41,50 @@ class NewsList extends Component {
         this.props.fetchNewsList(this.state.pageNo)
     }
 
-    renderItem = (item) => {
+    renderItem = ({ item, index }) => {
+        console.log("item:" + JSON.stringify(item))
         return (
-            <NewsData data={item}></NewsData>
+            <View style={styles.viewItem}>
+                <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontWeight: 'bold' }}>Title: </Text>
+                    <Text>{item.title}</Text>
+                </View>
+            </View>
         )
     }
 
+    renderSeparator = () => (
+        <View style={{
+            backgroundColor: 'black',
+            height: 0.6
+        }} />
+    );
+
     render() {
-        console.log("Response:" + JSON.stringify(this.props.newsData))
-        switch (this.props.newsData.isFetching) {
+        switch (this.props.isFetching) {
             case true:
-                break;
+                return <View style={styles.viewLoader}>
+                    <ActivityIndicator size={'large'} />
+                </View>
             case false:
-                return(
-                    <FlatList ></FlatList>
+                return (
+                    <View style={styles.viewParent}>
+                        <FlatList
+                            keyExtractor={(item, index) => item.created_at}
+                            data={this.props.news}
+                            renderItem={(index) => this.renderItem(index)}
+                            ItemSeparatorComponent={this.renderSeparator}
+                        />
+                    </View>
                 )
         }
-        return (
-            <View style={styles.viewParent}>
-            </View>
-        )
     }
 }
 
 function mapStateToProps(state) {
+    const { isFetching, news } = state.news
     return {
-        newsData: state.news
+        isFetching, news
     }
 }
 
@@ -79,8 +97,13 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(NewsList)
 
 const styles = StyleSheet.create({
-    viewParent: {
+    viewLoader: {
         flex: 1,
-        backgroundColor: 'yellow'
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    viewItem: {
+        paddingHorizontal: 5,
+        paddingVertical: 10
     }
 })

@@ -1,6 +1,6 @@
-import { createStore, applyMiddleware } from './node_modules/redux';
+import { createStore, applyMiddleware } from 'redux';
 import app from '../reducers';
-import thunk from './node_modules/redux-thunk';
+import thunk from 'redux-thunk';
 
 export default function configureStore() {
     let store = createStore(app, applyMiddleware(thunk))

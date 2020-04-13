@@ -7,9 +7,9 @@
  */
 
 import React, { Component } from 'react';
-import NewsList from './src/components/NewsList';
+import NewsList from './components/NewsList';
 import { Provider } from 'react-redux';
-import configureStore from './src/store/configureStore';
+import configureStore from './redux/store/configureStore';
 
 const store = configureStore()
 
